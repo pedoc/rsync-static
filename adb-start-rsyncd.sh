@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Variables
+rsync_ip="127.0.0.1"
+port="1873"
+android_path_rsync="/"
+
 # Get android arch
 arch=$(adb shell getprop ro.product.cpu.abi)
 case $arch in
@@ -17,6 +22,9 @@ adb shell killall rsync
 # Push rsync
 adb push rsync.bin /data/rsync
 adb shell chmod +x /data/rsync
+
+# Create rsyncd.conf
+echo -e "address = $rsync_ip\nport = $port\n[root]\npath = $android_path_rsync\nuse chroot = false\nread only = false\nuid = 0\ngid = 0" > rsyncd.conf
 adb push rsyncd.conf /data/rsyncd.conf
 
 # Start rsync daemon on the device
